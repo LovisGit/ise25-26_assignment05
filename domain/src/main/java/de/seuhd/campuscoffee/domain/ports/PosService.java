@@ -43,7 +43,14 @@ public interface PosService {
      */
     @NonNull Pos getById(@NonNull Long id) throws PosNotFoundException;
 
-    // TODO: Add a new getByName method to enable fetching POS by name.
+    /**
+     * Retrieves Points of Sale matching the specified filter criteria.
+     * Currently supports filtering by name (case-sensitive, exact match).
+     *
+     * @param name the name filter to apply; must not be null
+     * @return a list of POS entities matching the filter; never null, but may be empty if no matches found
+     */
+    @NonNull Pos getByFilter(@NonNull String name) throws PosNotFoundException;
 
     /**
      * Creates a new POS or updates an existing one.

@@ -17,6 +17,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +92,11 @@ public class CucumberPosSteps {
         assertThat(retrievedPosList).isEmpty();
     }
 
-    // TODO: Add Given step for new scenario
+    @Given("POS list with three entries")
+    public void posListWithThreeEntries(List<PosDto> posList) {
+        createdPosList = createPos(posList);
+        assertThat(createdPosList).size().isEqualTo(posList.size());
+    }
 
     // When -----------------------------------------------------------------------
 
@@ -101,7 +106,27 @@ public class CucumberPosSteps {
         assertThat(createdPosList).size().isEqualTo(posList.size());
     }
 
-    // TODO: Add When step for new scenario
+    @When("I update one POS entry")
+    public void iUpdateAPosEntry() {
+        List<PosDto> retrievedPosList = retrievePos();
+        PosDto original = retrievedPosList.getFirst();
+
+        PosDto modified = new PosDto(
+                original.id(),
+                original.createdAt(),
+                LocalDateTime.now(),
+                original.name(),
+                original.description() + " - updated",
+                original.type(),
+                original.campus(),
+                original.street(),
+                original.houseNumber(),
+                original.postalCode(),
+                original.city()
+        );
+
+        updatePos(List.of(modified));
+    }
 
     // Then -----------------------------------------------------------------------
 
@@ -113,5 +138,14 @@ public class CucumberPosSteps {
                 .containsExactlyInAnyOrderElementsOf(createdPosList);
     }
 
-    // TODO: Add Then step for new scenario
+    @Then("The POS entry should be modified")
+    public void thePosEntryShouldBeModified() {
+        List<PosDto> retrievedPosList = retrievePos();
+
+        PosDto original = createdPosList.getFirst();
+
+        PosDto updatedPos = retrievePosByName(original.name());
+
+        assertThat(updatedPos.description()).isEqualTo(original.description() + " - updated");
+    }
 }
